@@ -1,6 +1,6 @@
 ---
 title: "Mini Data-Analysis Deliverable 1"
-output: html_document
+output: github_document
 ---
 
 # Welcome to your (maybe) first-ever data analysis project!
@@ -161,7 +161,7 @@ head(cancer_sample)
 
 <!-------------------------- Start your work below ---------------------------->
 
-I choose *apt_buildings, it have many features to explore, and they have very self-explanatory names. I also like it does not have free text field like in stream_game, so I can factorize most of the column.*
+-   I choose *`apt_buildings`, it have many features to explore, and they have very self-explanatory names. I also like it does not have free text field like in stream_game, so I can factorize most of the column.*
 
 <!----------------------------------------------------------------------------->
 
@@ -169,7 +169,7 @@ I choose *apt_buildings, it have many features to explore, and they have very se
 
 <!-------------------------- Start your work below ---------------------------->
 
-What is the trend between the `year_built` and `no_of_storeys` of an apartment?
+-   What is the trend between the `year_built` and `no_of_storeys` of an apartment?
 
 <!----------------------------------------------------------------------------->
 
@@ -225,22 +225,29 @@ Make sure that you're using dplyr and ggplot2 rather than base R for this task. 
     What is the trend between the `year_built` and `no_of_storeys` of an apartment?
 
     ```{r}
-    ggplot(apt_buildings, aes(x = year_built ,y=no_of_storeys))+ 
-      geom_point()+
-      labs(title = "Relationship Between Year Built and Number of Stories",
-           x = "Year Built",
-           y = "Number of Stories")
+    average_stories_per_year <- apt_buildings %>%
+      group_by(year_built) %>%
+      summarise(avg_stories = mean(no_of_storeys, na.rm = TRUE))
+
+    ggplot(average_stories_per_year, aes(x = year_built, y = avg_stories)) +
+      geom_line() +
+      labs(
+        title = "Average Number of Stories in Apartments Over the Years",
+        x = "Year Built",
+        y = "Average Stories"
+      ) +
+      theme_minimal()
     ```
 
 4.  Investigate how many missing values there are per variable. Can you find a way to plot this?
 
     ```{r}
-    missing_counts <- apt_buildings %>%
+    missing_var <- apt_buildings %>%
       summarise_all(~ sum(is.na(.))) %>%
-      gather(variable, missing_count)
+      gather(variable, missing_num)
 
     # Create a bar plot using ggplot2
-    ggplot(missing_counts, aes(x = variable, y = missing_count)) +
+    ggplot(missing_var, aes(x = reorder(variable, -missing_num), y = missing_num)) +
       geom_bar(stat = "identity", fill = "red") +
       labs(
         title = "Missing Value Counts Per Variable",
@@ -258,6 +265,14 @@ Make sure that you're using dplyr and ggplot2 rather than base R for this task. 
 **(4 points)** So far, you have chosen a dataset and gotten familiar with it through exploring the data. You have also brainstormed one research question that interested you (Task 1.4). Now it's time to pick 4 research questions that you would like to explore in Milestone 2! Write the 4 questions and any additional comments below.
 
 <!--- *****START HERE***** --->
+
+1.  How does average unit per story change over the year?
+
+2.  Do private apartment tend to have more parking space?
+
+3.  Do social housing have adequate fire safety? (fire alarm, sprinkle system, exterior fire excape)
+
+4.  Do apartment build in different period of time have similar type heating?
 
 <!----------------------------->
 
