@@ -1,4 +1,4 @@
-# Jacky's Mini Data Analysis
+# Output
 
 **Author**: Chun Hei (Jacky) Yiu
 
@@ -8,14 +8,9 @@ This repository is for the Mini Data Analysis (MDA) project, which is a part of 
 
 ## Files in this Repository
 
--   `mini-project-1.Rmd`: A RMarkdown file which contains the R code for the data analyses
+-   `my_model.rds`: a R binary file of a linear regression model generatd in milestone 2 task 4.2
 
--   `mini-project-1.md`: a rendered markdown file knit from `mini-project-1.Rmd`
+-   `summary.csv`: a csv file generated in milestone 2 task 4.1 
 
 -   `README.md`: the file that you are reading, provide a overview of the repository
 
-## How do you run the code?
-
-Downloaded the Rmd file and opened in Rstudio, and run the code.
-
-Please remember to install the package "`datateachr`" and "`tidyverse`" before running the code.
