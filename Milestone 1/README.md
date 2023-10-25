@@ -13,6 +13,7 @@ This repository is for Milestone 1 of the Mini Data Analysis (MDA) project, whic
 -   `mini-project-1.md`: a rendered markdown file knit from `mini-project-1.Rmd`
 
 -   `README.md`: the file that you are reading, provide a overview of the repository
+-   `mini-project-1_files/figure-gfm`: contain figure for `mini-project-1.md`
 
 ## How do you run the code?
 
