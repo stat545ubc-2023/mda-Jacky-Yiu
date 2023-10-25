@@ -8,10 +8,11 @@ This repository is for the Mini Data Analysis (MDA) project, which is a part of 
 
 ## Files in this Repository
 
--   `mini-project-1.Rmd`: A RMarkdown file which contains the R code for the data analyses
+-   `Milestone 1`: This folder contains document related to the mini data analysis milestone 1 which includes the `mini-project-1.Rmd`, `mini-project-1.md` and `mini-project-1_files` which includes the figures generated on R.
 
--   `mini-project-1.md`: a rendered markdown file knit from `mini-project-1.Rmd`
+-   `Milestone 2`: This folder contains document related to the mini data analysis milestone 2 which includes the `mini-project-2.Rmd`, `mini-project-2.md` and `mini-project-2_files` which includes the figures generated on R.
 
+- `output`: This folder contains our put from milestone 2 
 -   `README.md`: the file that you are reading, provide a overview of the repository
 
 ## How do you run the code?
