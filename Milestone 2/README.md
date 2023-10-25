@@ -1,4 +1,4 @@
-# JMilestone 2
+# Milestone 2
 
 **Author**: Chun Hei (Jacky) Yiu
 
