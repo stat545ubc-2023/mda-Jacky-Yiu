@@ -1,10 +1,10 @@
-# Jacky's Mini Data Analysis
+# Milestone 1
 
 **Author**: Chun Hei (Jacky) Yiu
 
 ## Description
 
-This repository is for the Mini Data Analysis (MDA) project, which is a part of the STAT 545A course at the UBC.
+This repository is for Milestone 1 of the Mini Data Analysis (MDA) project, which is a part of the STAT 545A course at the UBC.
 
 ## Files in this Repository
 
