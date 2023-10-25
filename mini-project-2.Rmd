@@ -1,6 +1,6 @@
 ---
 title: "Mini Data Analysis Milestone 2"
-output: html_document
+output: github_document
 ---
 
 *To complete this milestone, you can either edit [this `.rmd` file](https://raw.githubusercontent.com/UBC-STAT/stat545.stat.ubc.ca/master/content/mini-project/mini-project-2.Rmd) directly. Fill in the sections that are commented out with `<!--- start your work here--->`. When you are done, make sure to knit to an `.md` file by changing the output in the YAML header to `github_document`, before submitting a tagged release on canvas.*
@@ -100,7 +100,7 @@ Make sure it's clear what research question you are doing each operation for!
 
 #### 1.2.1. How does average unit per story change over the year?
 
-I will first create `no_of_units_per_storeys` using mutate for the `apt_buildings` data set, some building have 0 story, those I will just put their `no_of_units` as `no_of_units_per_storeys` , the new column will be in `apt_buildings_new`
+I will first create `no_of_units_per_storeys` using mutate for the `apt_buildings` data set, some building have 0 story (that will make division by zero error), those I will just put their `no_of_units` as `no_of_units_per_storeys` , the new column will be in `apt_buildings_new`
 
 ```{r}
 apt_buildings_new = mutate(apt_buildings, 
@@ -109,14 +109,14 @@ apt_buildings_new = mutate(apt_buildings,
                                                                      no_of_units/no_of_storeys))
 ```
 
-##### Summarize 
+##### Summarize
 
-For I will pick task 3, I will separate `year_built` into time periods, year_build range from 1805 to 2019, so i will use 50 year apart
+For I will pick task 3, I will separate `year_built` into time periods, year_build range from 1805 to 2019, so i will use 50 year apart and split it into 5 time periods. Binning year_build into 5 year period help the the question since Categorical variables are often easier to visualize and interpret than continuous ones. It can help reduce noise in the analysis. I can focus on the overall trend within each period while ignoring minor fluctuations.
 
 ```{r}
 
-# Define the breaks for your time periods
-breaks <- c(1805, 1850, 1900, 1950, 2000, 2020)  # Adjust these as needed
+# Define the breaks for  time periods
+breaks <- c(1805, 1850, 1900, 1950, 2000, 2020) 
 
 # Create labels for the categories
 labels <- c("1805-1849", "1850-1899", "1900-1949", "1950-1999", "2000-2019")
@@ -129,15 +129,15 @@ apt_buildings_new <- apt_buildings_new %>%
 
 ##### **Graphing**
 
-For graphing, I decide to do task 8, I will
+For graphing, I decide to do task 8, I decide to make a boxplot with jittered points with logarithmic y-axis. By using a boxplot for each "year_build_period," the code allows for a straightforward comparison of the distribution of "no_of_units_per_storeys" across different years. You can easily see how the median, quartiles, and any potential outliers change over time. The use of a logarithmic scale on the y-axis is employed since the `no_of_units_per_storeys` spans a wide range.
 
 ```{r}
 ggplot(subset(apt_buildings_new, year_build_period != "NA"), aes(x = year_build_period, y = no_of_units_per_storeys)) +
   geom_boxplot( fill = "lightblue", width = 0.7) +
-  geom_jitter(aes(color = year_build_period), width = 0.2, alpha = 0.3) +
+  geom_jitter(aes(color = year_build_period), width = 0.2, alpha = 0.3) + 
   labs(
     x = "Built Year Period",
-    y = "Number of Units per Storey",
+    y = "Number of Units per Storey (log y)",
     title = "Boxplot of Number of Units per Storey by Year Built (50 years Period)"
   ) +
   theme_minimal() +
@@ -147,14 +147,14 @@ ggplot(subset(apt_buildings_new, year_build_period != "NA"), aes(x = year_build_
 
 #### 1.2.2. Do private apartment tend to have more parking space?
 
-I will use the variable `no_of_accessible_parking_spaces`
+I will use the variable `no_of_accessible_parking_spaces` for this research question
 
-##### Summarize 
+##### Summarize
 
-I will pick task 1, and compute the *range*, *mean*, *median*, and *Standard Deviation* of `no_of_accessible_parking_spaces`across the groups of **`property_type`**
+I will pick task 1, and compute the *range*, *mean*, *median*, and *Standard Deviation* of `no_of_accessible_parking_spaces`across the groups of **`property_type`** , this is useful to answer the question because these summary statistics provide a comprehensive understanding of the distribution of parking spaces within each property type, allowing us to compare the central tendency (mean and median) and variability (range and standard deviation) of parking spaces among property types. Helping us draw informed conclusions about parking space availability and make meaningful comparisons between private apartments and other property types.
 
 ```{r}
-apt_buildings_new %>% 
+summary_1.2.2 <- apt_buildings_new %>% 
   group_by(property_type) %>% 
   summarize(range = max(no_of_accessible_parking_spaces,na.rm=TRUE) - min(no_of_accessible_parking_spaces, na.rm=TRUE),
             mean = mean(no_of_accessible_parking_spaces, na.rm=TRUE),
@@ -162,12 +162,12 @@ apt_buildings_new %>%
             standard_deviation = sd(no_of_accessible_parking_spaces, na.rm=TRUE)
             )
 
-
+print(summary_1.2.2)
 ```
 
 ##### **Graphing**
 
-For graphing, I will pick task 6
+For graphing, I will pick task 6, using a boxplot with a log-transformed y-axis (log_y) to compare the number of accessible parking spaces (y) across different property types (x) is justified when addressing the question of whether private apartments tend to have more parking space because it allows for a better visualization of the data's wide range. As seen above, the range of `no_of_accessible_parking_spaces` is big in private compare to other property type.
 
 ```{r}
 ggplot(apt_buildings_new, aes(x = property_type, y = no_of_accessible_parking_spaces)) +
@@ -183,39 +183,49 @@ ggplot(apt_buildings_new, aes(x = property_type, y = no_of_accessible_parking_sp
 
 ### 1.2.3. Do social housing have adequate fire safety? (fire alarm, sprinkler system, exterior fire escape)
 
-##### Summarize 
+##### Summarize
 
-I pick task 2
+I computed the counts and proportion in each category of categorical variables (fire alarm, sprinkler system, exterior fire escape) across property_type.
 
 ```{r}
-safety_summary <- apt_buildings_new %>%
+summary_1.2.3 <- apt_buildings_new %>%
   group_by(property_type) %>%
   summarize(
-    prop_fire_alarm = sum(fire_alarm == "YES",  na.rm = TRUE) / n(),
-    count_fire_alarm = sum(fire_alarm == "YES",  na.rm = TRUE),
-    prop_sprinkle_system = sum(sprinkler_system == "YES",  na.rm = TRUE) / n(),
-    count_sprinkle_system = sum(sprinkler_system == "YES",  na.rm = TRUE),
-    prop_exterior_fire_escape = sum(exterior_fire_escape == "YES",  na.rm = TRUE) / n(),
-    count_exterior_fire_escape = sum(exterior_fire_escape == "YES",  na.rm = TRUE),
+    prop_fire_alarm_yes = sum(fire_alarm == "YES",  na.rm = TRUE) / n(),
+    count_fire_alarm_yes = sum(fire_alarm == "YES",  na.rm = TRUE),
+    prop_fire_alarm_no = sum(fire_alarm == "NO",  na.rm = TRUE) / n(),
+    count_fire_alarm_no = sum(fire_alarm == "NO",  na.rm = TRUE),    
+    prop_sprinkle_system_yes = sum(sprinkler_system == "YES",  na.rm = TRUE) / n(),
+    count_sprinkle_system_yes = sum(sprinkler_system == "YES",  na.rm = TRUE),
+    prop_sprinkle_system_no = sum(sprinkler_system == "NO",  na.rm = TRUE) / n(),
+    count_sprinkle_system_no = sum(sprinkler_system == "NO",  na.rm = TRUE),    
+    prop_exterior_fire_escape_yes = sum(exterior_fire_escape == "YES",  na.rm = TRUE) / n(),
+    count_exterior_fire_escape_yes = sum(exterior_fire_escape == "YES",  na.rm = TRUE),
+    prop_exterior_fire_escape_no = sum(exterior_fire_escape == "NO",  na.rm = TRUE) / n(),
+    count_exterior_fire_escape_no = sum(exterior_fire_escape == "NO",  na.rm = TRUE),    
     total_properties = n())
 
-print(safety_summary)
+print(summary_1.2.3)
 ```
 
 ##### **Graphing**
 
-For graphing, I pick
+For graphing, I pick task 8, I want to compare how the proportion of "YES" in all three safety feature differs across property type, to do that I need to pivot summary_1.2.3 to a longer version and only include column that `starts_with("prop")` & `ends_with("yes")`
 
 ```{r}
-safety_summary_long <- safety_summary %>%
+summary_1.2.3_long <- summary_1.2.3 %>%
   pivot_longer(
-    cols = starts_with("prop_"),
+    cols = starts_with("prop") & ends_with("yes"), #only include column that starts_with("prop") & ends_with("yes")
     names_to = "Safety_Variable",
     values_to = "Proportion"
   )
+```
 
+Than i create a geom_bar plot using `summary_1.2.3_long`, and use `geom_text` to add the percise percentage on top of each bar, this help me answer the question since I need to know how social house fire saftey compete with other property type to get a clear picture, if I just plot social housing, I have no comparison on how well it does.
+
+```{r}
 # Create a graph with two geom_bar layers
-ggplot(safety_summary_long, aes(x = property_type, y = Proportion, fill = Safety_Variable)) +
+ggplot(summary_1.2.3_long, aes(x = property_type, y = Proportion, fill = Safety_Variable)) +
   geom_bar(stat = "identity", position = "dodge") +
   geom_text(aes(label = paste0(round(Proportion * 100, 1), "%"), group = Safety_Variable), position = position_dodge(width = 0.9), vjust = -0.5) +
   labs(x = "Property Type", y = "Proportion of YES Responses") +
@@ -225,30 +235,31 @@ ggplot(safety_summary_long, aes(x = property_type, y = Proportion, fill = Safety
 
 ### 1.2.4. Do apartment build in different period of time have similar type heating?
 
-##### Summarize 
+##### Summarize
 
-I pick task 4
+I pick task 4, I compute the proportion and counts in each category of `heating_type` across `year_build_period`, using `year_build_period` instead of `year_build` help with reducing noise in data and help with filling the gaps in `year_build`. The summary table will than be use for graphing.
 
 ```{r}
-heating_summary <- subset(apt_buildings_new, year_build_period != "NA") %>%
+summary_1.2.4 <- subset(apt_buildings_new, year_build_period != "NA") %>%
   filter(!is.na(heating_type)) %>%
   group_by(year_build_period, heating_type) %>%
   summarize(
     count = n()
   )%>%  
-  mutate(freq = count / sum(count))
+  mutate(prop = count / sum(count))
 
-print(heating_summary)
+print(summary_1.2.4)
 ```
 
 ##### **Graphing**
 
-I pick Task 8
+I pick Task 8, I creates a grouped bar chart where it displays the proportion of "YES" responses for different categories of "heating_type" across various "year_build_period" groups. The height of each section of the stacked bar represents the proportion of "YES" responses for a particular heating type within a specific year build period. Different categories of "heating_type" are distinguished by color. I also use `geom_text` to add the precise percentage on top of each bar, I can see how the number change over time.
 
 ```{r}
-ggplot(heating_summary, aes(x = year_build_period, y = freq, fill = heating_type)) +
-  geom_bar(stat = "identity", position = "dodge") +
-  geom_text(aes(label = paste0(round(freq * 100, 1), "%"), group = heating_type), position = position_dodge(width = 1), vjust = -0.5) +
+ggplot(summary_1.2.4, aes(x = year_build_period, y = prop, fill = heating_type)) +
+  geom_col()+
+  geom_text(aes(label = paste0(round(prop * 100, 1), "%")),
+              position = position_stack(vjust = .5))+
   labs(x = "Property Type", y = "Proportion of YES Responses") +
   scale_y_continuous(labels = scales::percent)+
   theme_minimal()
@@ -262,13 +273,43 @@ Based on the operations that you've completed, how much closer are you to answer
 
 <!------------------------- Write your answer here ---------------------------->
 
-1\.
+1.  How does average unit per story change over the year?
 
-2\.
+    -   In the box plot shown 1.2.1, we can see that the median for number of unit per story increase as it become more modern, why might make sense as Developers and builders may find it more cost-effective to create buildings with a larger number of smaller units, especially in urban areas with high land values.
 
-3\.
+    -   We also observe that most building are built in the period of 1950 - 1999, which also make sense since the mid-20th century, especially the post-World War II era, witnessed significant construction activity in many parts of the world. This was due to the need for rebuilding after the war and the growth of urban populations.
 
-4\.
+    -   However it remain unclear how much `year_built` influence `unit per story` , a linear model might able to answer that question
+
+2.  Do private apartment tend to have more parking space?
+
+    -   In the box plot shown in 1.2.2, we can see that the median for accessible parking space is highest in private property. IT could be due to Social housing complexes and TCHC ([Toronto Community Housing](https://www.torontohousing.ca/)) may have budget constraints or other limitations that could affect their ability to provide as many accessible parking spaces.
+
+    -   We also see that it range is much larger, meaning some property have large number of parking while some have none. which make sense as Private properties often have different owners and management entities, each with its own approach to providing accessible parking. This diversity can lead to variations in the number of accessible parking spaces.
+
+    -   Overall, it does answer my researcher question
+
+3.  Do social housing have adequate fire safety? (fire alarm, sprinkle system, exterior fire escape)
+
+    -   In the bar plot presented in section 1.2.3, it's evident that fire alarms are prevalent across nearly all property types. This observation underscores the significance of fire alarms in building regulations, as they are consistently prioritized to ensure safety.
+
+    -   Conversely, a noteworthy finding is that fewer than 20% of properties of each type have exterior fire escapes. This can be attributed to the fact that building codes do not always mandate exterior fire escapes, especially in modern buildings. Instead, contemporary structures are designed with alternative safety features, such as interior fire exits, sprinkler systems, and alarms.
+
+    -   Of particular interest is the wide-ranging proportion of apartments equipped with sprinkler systems. Private properties have a 63% adoption rate, social housing stands at 82%, and TCHC impressively records 98.8% of their apartments with sprinkler systems. This variation could be attributed to historical factors, with older buildings often lacking sprinkler systems due to evolving fire safety requirements. In contrast, newer constructions are more likely to incorporate these systems, aligning with modern safety standards.
+
+    -   Further analysis to compare the presence of sprinkler systems with the `year_build_period` variable would offer valuable insights into the evolution of fire safety measures in different building structures.
+
+4.  Do apartment build in different period of time have similar type heating?
+
+    -   In the bar plot shown in 1.2.4, we could see a interesting trend ins each type of heating:
+
+        -   Hot water heating remain the majority heating type across the years, however the proportion show a sharp decrease in 2000-2019, where forced air gas heating is coming up from behind. Which make sense as advances in heating technology have made forced air gas heating more efficient and cost-effective, leading to its increased adoption in more recent years.
+
+        -   number of apartments built with electric heating systems decreases every time period while the number of apartments with forced air gas heating systems increases every time period. This might be explain by Forced air gas heating systems are generally more energy-efficient and cost-effective than electric heating systems. Property developers and owners may opt for gas heating to reduce long-term energy expenses.
+
+        -   It might be interesting to fit a linear regression model to predict how the trend will go.
+
+    -   I would like to refine my research question to "How is the trends in each type of heating change over different time periods", the trend on how time change the heating system use might be a interesting questiom.
 
 <!----------------------------------------------------------------------------->
 
@@ -288,6 +329,16 @@ Based on the definition above, can you identify if your data is tidy or untidy? 
 
 <!--------------------------- Start your work below --------------------------->
 
+```{r}
+glimpse(apt_buildings_new)
+```
+
+-   My data is untidy in several columns: "`amenities`," "`parking_type`," "`facilities_available`," and "`bike_parking`" as they contain multiple values within a single cell.
+
+-   Additionally, the "`site_address`" column can be separated into "street_number" and "street_name."
+
+-   However, all other columns appear to be tidy.
+
 <!----------------------------------------------------------------------------->
 
 ### 2.2 (4 points)
@@ -300,6 +351,178 @@ Be sure to explain your reasoning for this task. Show us the "before" and "after
 
 <!--------------------------- Start your work below --------------------------->
 
+#### 2.2.1 Tidying the data
+
+##### 2.2.1.1 tidy `amenities`
+
+first, lets tidy up `amenities` . it have comma seprated value within one cell, which is not tidy, I first reshapes it by first separating it into multiple rows using `separate_rows`. Then, I adds a new column called "value" with the constant value "YES." Next, it pivots the data so that each unique value from the separated column becomes a separate column in the resulting dataset, with "YES" indicating the presence of the amenity and "N0" as a fill value where amenities are absent. Finally, I prefixes the column names with "amenity\_" to create a tidy dataset where each column represents a specific amenity and indicates its presence or absence in each apartment building.
+
+```{r}
+apartments_tidy <- apt_buildings_new %>%
+  separate_rows(amenities, sep = " , ") %>% #first separating amenities into multiple rows using separate_rows
+  mutate(value = "YES") %>%  #adds a new column called "value" with the constant value "YES.", meaning the presence of the amenity 
+  pivot_wider(names_from = amenities, values_from = value, values_fill = "N0", names_prefix = "amenity_")
+
+glimpse(apartments_tidy)
+```
+
+##### 2.2.1.2 tidy `parking_type`
+
+same as `amenities` . it have comma separated value within one cell, which is not tidy, I tidy it using a the same method as mentioned above
+
+```{r}
+apartments_tidy <- apartments_tidy %>%
+  separate_rows(parking_type, sep = " , ") %>% #first separating parking_type into multiple rows using separate_rows
+  mutate(value = "YES") %>% #adds a new column called "value" with the constant value "YES.", meaning the presence of the parking_type 
+  pivot_wider(names_from = parking_type, values_from = value, values_fill = "NO" , names_prefix = "parking_type_")
+
+glimpse(apartments_tidy)
+```
+
+##### 2.2.1.3 tidy facilities_available
+
+it have slash separated value within one cell, which is not tidy, I tidy it using a the same method as mentioned above but using `sep = "/"`
+
+```{r}
+apartments_tidy <- apartments_tidy %>%
+  separate_rows(facilities_available, sep = "/") %>% #first separating facilities_available into multiple rows using separate_rows
+  mutate(value = "YES") %>% #adds a new column called "value" with the constant value "YES.", meaning the presence of the facilities_available 
+  pivot_wider(names_from = facilities_available, values_from = value, values_fill = "NO" , names_prefix = "facilities_available_")
+
+glimpse(apartments_tidy)
+```
+
+##### 2.2.1.4 tidy `bike_parking`
+
+it have 2 value "indoor_parking", "outdoor_parking" with in one cells, which is not tidy. I first use `separate` to sepate it into two column "`indoor_parking`", "`outdoor_parking`" with "and" as delimiter, The two new column is still not tidy, it have mixed of word ans number, we only want the number. So i use mutate to extract numberical data from two column, there is also missing data with valle set to "Not Available", I convert those to NA.
+
+The result should be two new column "indoor_parking", "outdoor_parking" with numerical data indicating the number of parking space.
+
+```{r}
+apartments_tidy <- apartments_tidy %>%
+  separate(bike_parking, into = c("indoor_parking", "outdoor_parking"), sep = "and", extra = "merge", fill = "right") %>% #seprerate in to "indoor_parking", "outdoor_parking" 
+  mutate(
+    indoor_parking = ifelse(grepl("Not Available", indoor_parking), #use mutate to extract numberical data from two coloumn, set "Not Available" -> NA
+                            NA, 
+                            as.numeric(gsub("[^0-9]", 
+                                            "", 
+                                            indoor_parking))),
+    outdoor_parking = ifelse(is.na(outdoor_parking), 
+                             NA, 
+                             as.numeric(gsub("[^0-9]", 
+                                             "", 
+                                             outdoor_parking)))
+  )
+
+glimpse(apartments_tidy)
+```
+
+##### 2.2.1.4 tidy `site_address`
+
+For `site_address` , I just use separate to turn it into 2 new column "`street_number`", "`street_name`"
+
+```{r}
+apartments_tidy <- apartments_tidy %>%
+  separate(site_address, into = c("street_number", "street_name"), extra = "merge")
+
+glimpse(apartments_tidy)
+```
+
+#### 2.2.2 Untidy the data
+
+##### 2.2.2.1 untidy `amenities`
+
+The transformation involves several steps. Initially, it uses the **`pivot_longer`** function to revert the effects of a previous **`pivot_wider`** operation, transforming columns that start with "amenity\_" back into individual rows. After this reformatting, it proceeds to clean up the data by removing the "amenity\_" prefix from the newly created "amenities" column. Subsequently, it filters the data to retain only the rows where the "value" column indicates "YES," focusing on the amenities with this affirmative response. The "value" column, no longer needed, is then removed. The data is grouped by the "id" column in preparation for the next step, which involves using the **`summarize`** function. Here, it concatenates the "amenities" for each "id" into a single string, thereby undoing a previous operation that separated amenities into individual rows. To finalize the transformation, the code performs a left join with the original "apartments_tidy" dataset. During this process, it excludes the columns starting with "amenity\_" to merge the newly created amenities back with the original dataset, ultimately restoring the data to its initial structure. This untidying process reverses previous data manipulations, re-establishing the original data format where amenities are combined into a single string for each "id."
+
+```{r}
+apartments_original <- apartments_tidy %>%
+  pivot_longer(cols = starts_with("amenity_"), names_to = "amenities", values_to = "value") %>% #undo pivot_wider
+  mutate(amenities = sub("amenity_", "", amenities)) %>% #remove prefix
+  filter(value == "YES") %>% #only include row with "YES" 
+  select(-value) %>% #remove value coloumn
+  group_by(id) %>% # use id for grouping
+  summarize(amenities = paste(amenities, collapse = " , ")) %>% #undo separate_rows byr using summarize to get back the original amenities
+  left_join(apartments_tidy %>% select(-starts_with("amenity_")), by = "id") # join the newly made amenities with apartments_tidy and remove old coloumn that start with "amenity_"
+
+
+glimpse(apartments_original)
+```
+
+##### 2.2.2.2 untidy `parking_type`
+
+it uses the same process as mention in 2.2.2.1, just change `amenities` to `parking_type`
+
+```{r}
+apartments_original <- apartments_original %>% 
+  pivot_longer(cols = starts_with("parking_type_"), names_to = "parking_type", values_to = "value") %>% #undo pivot_wider
+  mutate(parking_type = sub("parking_type_", "", parking_type)) %>% #remove prefix
+  filter(value == "YES") %>% #only include row with "YES" 
+  select(-value) %>% #remove value coloumn
+  group_by(id) %>%  # use id for grouping
+  summarize(parking_type = paste(parking_type, collapse = " , ")) %>% #undo separate_rows byr using summarize to get back the original parking_type
+  left_join(apartments_original %>% select(-starts_with("parking_type_")), by = "id") #undo separate_rows byr using summarize to get back the original parking_type
+
+glimpse(apartments_original)
+```
+
+##### 2.2.2.3 untidy `facilities_available`
+
+it uses the same process as mention in 2.2.2.1, just change `amenities` to `facilities_available` and `collapse = "/"`
+
+```{r}
+apartments_original <- apartments_original %>%
+  pivot_longer(cols = starts_with("facilities_available_"), names_to = "facilities_available", values_to = "value") %>% #undo pivot_wider
+  mutate(facilities_available = sub("facilities_available_", "", facilities_available)) %>%  #remove prefix
+  filter(value == "YES") %>% #only include row with "YES" 
+  select(-value) %>% #remove value coloumn
+  group_by(id) %>% # use id for grouping
+  summarize(facilities_available = paste(facilities_available, collapse = "/")) %>% #undo separate_rows byr using summarize to get back the original facilities_available
+  left_join(apartments_original %>% select(-starts_with("facilities_available_")), by = "id")  #undo separate_rows byr using summarize to get back the original facilities_available
+
+glimpse(apartments_original)
+```
+
+##### 2.2.2.4 untidy `bike_parking`
+
+First , I convert the "`indoor_parking`" and "`outdoor_parking`" columns to character data types, replacing "NA" values in the "`indoor_parking`" column with "Not Available," and combining the parking information into a new "`bike_parking`" column that describes the number of indoor and outdoor parking spots. The original "`indoor_parking`" and "`outdoor_parking`" columns are then removed from the data frame to create a more consolidated and informative representation of parking facilities.
+
+```{r}
+apartments_original <- apartments_original %>%
+  mutate(
+    indoor_parking = as.character(indoor_parking),
+    outdoor_parking = as.character(outdoor_parking),
+    bike_parking = ifelse(indoor_parking == "NA", "Not Availible", paste0(indoor_parking, " indoor parking spots and ", outdoor_parking, " outdoor parking spots"))
+  ) %>%
+  select(-indoor_parking, -outdoor_parking)
+
+glimpse(apartments_original)
+```
+
+##### 2.2.2.4 untidy `site_adress`
+
+for site address, I just use `unite` to redo the `separate` done in the tidying step
+
+```{r}
+apartments_original <- apartments_original %>%
+  unite(site_address, street_number, street_name, sep = " ")
+
+glimpse(apartments_original)
+```
+
+#### 2.2.3 Before and After
+
+After tidy, apartments_tidy have have same row but more column than original data `apt_buildings_new`
+
+```{r}
+glimpse(apartments_tidy)
+```
+
+After un-tidying, `apartments_original` have the same dimension as original data `apt_buildings_new`
+
+```{r}
+glimpse(apt_buildings_new)
+```
+
 <!----------------------------------------------------------------------------->
 
 ### 2.3 (4 points)
@@ -308,8 +531,8 @@ Now, you should be more familiar with your data, and also have made progress in 
 
 <!-------------------------- Start your work below ---------------------------->
 
-1.  *FILL_THIS_IN*
-2.  *FILL_THIS_IN*
+1.  How does average unit per story change over the year?
+2.  Do apartment build in different period of time have similar type heating?
 
 <!----------------------------------------------------------------------------->
 
@@ -317,11 +540,49 @@ Explain your decision for choosing the above two research questions.
 
 <!--------------------------- Start your work below --------------------------->
 
+1.  it remain unclear how much `year_built` influence `unit per story` , I would like to fit a linear model to answer that question.
+2.  I refined my research question to "How is the trends in each type of heating change over different time periods" after I made the plot in 1.2.4, the trand on how time change the heating system use seem like a interesting questiom.
+
 <!----------------------------------------------------------------------------->
 
 Now, try to choose a version of your data that you think will be appropriate to answer these 2 questions. Use between 4 and 8 functions that we've covered so far (i.e. by filtering, cleaning, tidy'ing, dropping irrelevant columns, etc.).
 
 (If it makes more sense, then you can make/pick two versions of your data, one for each research question.)
+
+for "How does average unit per story change over the year?"
+
+the following data set should be suitable for linear rgression
+
+```{r}
+
+average_unit_per_story = mutate(apt_buildings, 
+                                no_of_units_per_storeys = if_else(no_of_storeys == 0, 
+                                                                  no_of_units,
+                                                                  no_of_units/no_of_storeys)) %>% 
+  select(c("year_built","no_of_units_per_storeys"))
+  
+average_unit_per_story <- average_unit_per_story %>%
+      group_by(year_built) %>%
+      summarise(avg_unit_per_story = mean(no_of_units_per_storeys, na.rm = TRUE)) 
+
+print(average_unit_per_story)
+```
+
+for "How is the trends in each type of heating change over different time periods".
+
+I use the similar step in 1.2.4,as it seem to how case hoe each heating type change throughout the year the best
+
+```{r}
+heating_trand <- subset(apt_buildings_new, year_build_period != "NA") %>%
+  filter(!is.na(heating_type)) %>%
+  group_by(year_build_period, heating_type) %>%
+  summarize(
+    count = n()
+  )%>%  
+  mutate(prop = count / sum(count))
+
+print(heating_trand)
+```
 
 <!--------------------------- Start your work below --------------------------->
 
@@ -333,9 +594,9 @@ Pick a research question from 1.2, and pick a variable of interest (we'll call i
 
 <!-------------------------- Start your work below ---------------------------->
 
-**Research Question**: FILL_THIS_IN
+**Research Question**: How does average unit per story change over the year?
 
-**Variable of interest**: FILL_THIS_IN
+**Variable of interest**: `unit per story`
 
 <!----------------------------------------------------------------------------->
 
@@ -351,6 +612,17 @@ Fit a model or run a hypothesis test that provides insight on this variable with
 
 <!-------------------------- Start your work below ---------------------------->
 
+```{r}
+   average_unit_per_story <- apt_buildings_new %>%
+      group_by(year_built) %>%
+      summarise(avg_unit_per_story = mean(no_of_units_per_storeys, na.rm = TRUE))
+   
+   model <- lm(avg_unit_per_story ~ year_built, data = average_unit_per_story)
+   
+   print(model)
+
+```
+
 <!----------------------------------------------------------------------------->
 
 ## 3.2 (3 points)
@@ -362,6 +634,19 @@ Produce something relevant from your fitted model: either predictions on Y, or a
 -   Obtain your results using the `broom` package if possible. If your model is not compatible with the broom function you're needing, then you can obtain your results by some other means, but first indicate which broom function is not compatible.
 
 <!-------------------------- Start your work below ---------------------------->
+
+```{r}
+library(broom)
+
+# Obtain the regression coefficients using the tidy function
+coefficients <- tidy(model)
+
+# Filter for the coefficient related to the "year" variable
+year_coefficient <- coefficients[coefficients$term == "year_built", ]
+
+# Print the coefficient value
+cat("Coefficient for 'year_built':", year_coefficient$estimate)
+```
 
 <!----------------------------------------------------------------------------->
 
@@ -378,6 +663,18 @@ Take a summary table that you made from Task 1, and write it as a csv file in yo
 
 <!-------------------------- Start your work below ---------------------------->
 
+```{r}
+library(here)
+
+output_path <- here("output")
+
+if (!dir.exists(output_path)) {
+  dir.create(output_path)
+}
+
+write.csv(summary_1.2.2, file = file.path(output_path, "summary.csv"), row.names = FALSE)
+```
+
 <!----------------------------------------------------------------------------->
 
 ## 4.2 (3 points)
@@ -387,6 +684,16 @@ Write your model object from Task 3 to an R binary file (an RDS), and load it ag
 -   The same robustness and reproducibility criteria as in 4.1 apply here.
 
 <!-------------------------- Start your work below ---------------------------->
+
+```{r}
+output_path <- here("output")
+model_file <- file.path(output_path, "my_model.rds")
+saveRDS(model, model_file)
+```
+
+```{r}
+loaded_model <- readRDS(model_file)
+```
 
 <!----------------------------------------------------------------------------->
 
