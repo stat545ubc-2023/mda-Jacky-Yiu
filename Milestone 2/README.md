@@ -4,7 +4,7 @@
 
 ## Description
 
-This repository is for Milstone 2 of the Mini Data Analysis (MDA) project, which is a part of the STAT 545A course at the UBC.
+This repository is for Milestone 2 of the Mini Data Analysis (MDA) project, which is a part of the STAT 545A course at the UBC.
 
 ## Files in this Repository
 
