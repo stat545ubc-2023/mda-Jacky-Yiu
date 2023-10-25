@@ -12,7 +12,7 @@ This repository is for the Mini Data Analysis (MDA) project, which is a part of 
 
 -   `Milestone 2`: This folder contains document related to the mini data analysis milestone 2 which includes the `mini-project-2.Rmd`, `mini-project-2.md` and `mini-project-2_files` which includes the figures generated on R.
 
-- `output`: This folder contains our put from milestone 2 
+- `output`: This folder contains outputs from milestone 2 
 -   `README.md`: the file that you are reading, provide a overview of the repository
 
 ## How do you run the code?
