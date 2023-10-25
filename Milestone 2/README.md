@@ -1,18 +1,19 @@
-# Jacky's Mini Data Analysis
+# JMilestone 2
 
 **Author**: Chun Hei (Jacky) Yiu
 
 ## Description
 
-This repository is for the Mini Data Analysis (MDA) project, which is a part of the STAT 545A course at the UBC.
+This repository is for Milstone 2 of the Mini Data Analysis (MDA) project, which is a part of the STAT 545A course at the UBC.
 
 ## Files in this Repository
 
--   `mini-project-1.Rmd`: A RMarkdown file which contains the R code for the data analyses
+-   `mini-project-2.Rmd`: A RMarkdown file which contains the R code for the data analyses
 
--   `mini-project-1.md`: a rendered markdown file knit from `mini-project-1.Rmd`
+-   `mini-project-2.md`: a rendered markdown file knit from `mini-project-2.Rmd`
 
 -   `README.md`: the file that you are reading, provide a overview of the repository
+-   `mini-project-2_files`: contain figure for mini-project-2.md
 
 ## How do you run the code?
 
